@@ -3,16 +3,16 @@ package br.com.esdrasdl.challenge.remote.response
 import com.google.gson.annotations.SerializedName
 
 data class OrdersResponse(
-    @SerializedName("summary") val summary: OrderSummary,
-    @SerializedName("orders") val orders: List<OrderResponse>
+    @SerializedName("summary") val summary: SummaryResponse,
+    @SerializedName("orders") val orders: List<SimpleOrderResponse>
 )
 
-data class OrderSummary(
-    @SerializedName("") val count: Int,
-    @SerializedName("") val amount: Int
+data class SummaryResponse(
+    @SerializedName("count") val count: Int,
+    @SerializedName("amount") val amount: Int
 )
 
-data class OrderResponse(
+data class SimpleOrderResponse(
     @SerializedName("id") val id: String,
     @SerializedName("ownId") val ownId: String,
     @SerializedName("status") val status: String,
@@ -21,7 +21,7 @@ data class OrderResponse(
     @SerializedName("customer") val customer: CustomerResponse,
     @SerializedName("createdAt") val createdAt: String,
     @SerializedName("updatedAt") val updatedAt: String
-)
+    )
 
 data class AmountResponse(
     @SerializedName("total") val total: Int,
@@ -29,7 +29,8 @@ data class AmountResponse(
     @SerializedName("fees") val fees: Int,
     @SerializedName("deduction") val deduction: Int,
     @SerializedName("otherReceivers") val otherReceivers: Int,
-    @SerializedName("currency") val currency: String
+    @SerializedName("currency") val currency: String,
+    @SerializedName("liquid") val liquid: Int
 )
 
 data class CustomerResponse(
