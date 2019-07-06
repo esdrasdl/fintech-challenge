@@ -1,8 +1,12 @@
 package br.com.esdrasdl.challenge.ui
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import br.com.esdrasdl.challenge.AppSchedulerProvider
 import br.com.esdrasdl.challenge.BuildConfig
 import br.com.esdrasdl.challenge.R
@@ -47,8 +51,15 @@ class SignInActivity : AppCompatActivity() {
         val repository = loadUserRepository()
         useCase = GetToken(repository = repository, executor = AppSchedulerProvider())
 
+        userNameField.setRightDrawable(ContextCompat.getDrawable(this, R.drawable.ic_cancel_black_24dp))
+        userNameField.makeClearable {
+            userNameLayout.error = null
+        }
         passwordField.onChange {
             passwordLayout.error = null
+        }
+        userNameField.onChange {
+            userNameLayout.error = null
         }
     }
 
@@ -97,7 +108,52 @@ class SignInActivity : AppCompatActivity() {
         return UserRepo(localRepository, remoteRepository)
     }
 
+    private fun EditText.setRightDrawable(drawable: Drawable?) {
+        drawable?.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+        setCompoundDrawables(null, null, drawable, null)
+    }
+
+    private fun EditText.makeClearable(onCleared: (() -> Unit)? = null) {
+        compoundDrawables[COMPOUND_DRAWABLE_RIGHT_INDEX]?.let { clearDrawable ->
+            makeClearable(onCleared, clearDrawable)
+        }
+    }
+
+    private fun EditText.makeClearable(onClear: (() -> Unit)?, clearDrawable: Drawable) {
+        val updateRightDrawable = {
+            val right = if (text.isNotEmpty()) clearDrawable else null
+            this.setCompoundDrawables(null, null, right, null)
+        }
+        updateRightDrawable()
+        this.onChange {
+            updateRightDrawable()
+        }
+        this.onRightDrawableClicked {
+            this.text.clear()
+            this.setCompoundDrawables(null, null, null, null)
+            onClear?.invoke()
+
+            this.requestFocus()
+        }
+    }
+
+    private fun EditText.onRightDrawableClicked(onClicked: (view: EditText) -> Unit) {
+        this.setOnTouchListener { v, event ->
+            var hasConsumed = false
+            if (v is EditText) {
+                if (event.x >= v.width - v.totalPaddingRight) {
+                    if (event.action == MotionEvent.ACTION_UP) {
+                        onClicked(this)
+                    }
+                    hasConsumed = true
+                }
+            }
+            hasConsumed
+        }
+    }
+
     companion object {
         val TAG = SignInActivity::class.java.canonicalName
+        private const val COMPOUND_DRAWABLE_RIGHT_INDEX = 2
     }
 }
