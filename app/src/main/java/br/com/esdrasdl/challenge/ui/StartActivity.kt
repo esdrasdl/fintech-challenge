@@ -18,7 +18,7 @@ class StartActivity : AppCompatActivity() {
 
         val repo = loadUserRepository()
         if (repo.hasUserInfo()) {
-            // TODO: Open Order Screen
+            startActivity(Intent(this, OrderListActivity::class.java))
         } else {
             startActivity(Intent(this, SignInActivity::class.java))
         }

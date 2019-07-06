@@ -1,8 +1,8 @@
 package br.com.esdrasdl.challenge.ui
 
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -95,7 +95,8 @@ class SignInActivity : AppCompatActivity() {
                     }
                 }
                 ViewState.Status.SUCCESS -> {
-                    Log.d(TAG, state.data.toString())
+                    startActivity(Intent(this, OrderListActivity::class.java))
+                    finish()
                 }
             }
         })

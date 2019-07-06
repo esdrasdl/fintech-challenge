@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/order_item_next"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:padding="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_navigate_next_white_24dp" />
+
+    <TextView
+        android:id="@+id/order_item_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/order_item_next"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="10/12/2019" />
+
+    <TextView
+        android:id="@+id/order_item_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/order_item_next"
+        app:layout_constraintTop_toBottomOf="@id/order_item_date"
+        tools:text="Aguardando" />
+
+    <TextView
+        android:id="@+id/order_item_value"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/order_item_date"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="R$100,00" />
+
+
+    <TextView
+        android:id="@+id/order_item_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/order_item_value"
+        tools:text="email@dominio.com" />
+
+    <TextView
+        android:id="@+id/order_item_ownid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/order_item_email"
+        tools:text="id_qra4111130193012" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
