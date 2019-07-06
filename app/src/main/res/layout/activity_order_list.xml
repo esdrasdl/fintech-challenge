@@ -10,7 +10,8 @@
         android:id="@+id/order_progressbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible" />
+        android:indeterminateTint="@android:color/white"
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/order_list"

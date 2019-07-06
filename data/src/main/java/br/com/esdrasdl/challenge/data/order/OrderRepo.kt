@@ -7,7 +7,7 @@ import io.reactivex.Observable
 
 class OrderRepo(private val remoteSource: OrderRemoteDataSource) : OrderRepository {
 
-    override fun getOrders():Observable<Pair<Summary,List<Order>>> {
+    override fun getOrders():Observable<List<Order>> {
         return remoteSource.getOrders()
     }
 

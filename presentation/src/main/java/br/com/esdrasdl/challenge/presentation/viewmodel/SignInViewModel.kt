@@ -18,12 +18,14 @@ class SignInViewModel(
     fun getState(): LiveData<ViewState<Any>> = state
 
     fun login(username: String, password: String) {
-        state.value = ViewState(ViewState.Status.LOADING)
         doLogin.execute(
             DoLogin.Params(
                 username = username,
                 password = password
             ),
+            doOnSubscribe = {
+                state.value = ViewState(ViewState.Status.LOADING)
+            },
             onNext = {
                 saveToken(it.token)
             },
