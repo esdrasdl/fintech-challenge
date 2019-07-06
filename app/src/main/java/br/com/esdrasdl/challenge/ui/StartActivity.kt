@@ -1,5 +1,6 @@
 package br.com.esdrasdl.challenge.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import br.com.esdrasdl.challenge.BuildConfig
@@ -19,7 +20,7 @@ class StartActivity : AppCompatActivity() {
         if (repo.hasUserInfo()) {
             // TODO: Open Order Screen
         } else {
-            // TODO: Open Login Screen
+            startActivity(Intent(this, SignInActivity::class.java))
         }
         finish()
     }

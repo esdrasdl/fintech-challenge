@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Fintech Challenge</string>
+    <string name="continue_login">Acessar minha conta</string>
+    <string name="waiting">Aguarde…</string>
+    <string name="password_hint">Senha</string>
+    <string name="e_mail_hint">E-mail</string>
 </resources>
