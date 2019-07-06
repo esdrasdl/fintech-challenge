@@ -117,8 +117,11 @@ class SignInActivity : AppCompatActivity() {
 
     // TODO: Use DI to inject it!
     private fun loadUserRepository(): UserRepo {
+        val authInterceptor = ApiServiceFactory.makeRequestInterceptor(TokenRepo(TokenLocalRepository()))
+
         val client = ApiServiceFactory.makeOkHttpClient(
-            httpLoggingInterceptor = ApiServiceFactory.makeLoggingInterceptor(BuildConfig.DEBUG)
+            httpLoggingInterceptor = ApiServiceFactory.makeLoggingInterceptor(BuildConfig.DEBUG),
+            authInterceptor = authInterceptor
         )
         val api = ApiServiceFactory.create(UserAPI::class.java, ApiServiceFactory.LOGIN_BASE_URL, client)
         val remoteRepository = UserRemoteRepository(api)

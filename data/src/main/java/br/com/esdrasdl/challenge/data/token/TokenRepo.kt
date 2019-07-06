@@ -8,12 +8,12 @@ class TokenRepo(private val local: TokenLocalDataSource) : TokenRepository {
 
     private var tokenCached: Token? = null
 
-    override fun getToken(): Token {
-        if (tokenCached == null) {
+    override fun getToken(): Token? {
+        if (tokenCached != null) {
             tokenCached = local.getToken()
         }
 
-        return tokenCached!!
+        return tokenCached
     }
 
     override fun saveToken(token: Token): Completable {

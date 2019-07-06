@@ -6,8 +6,8 @@ import com.orhanobut.hawk.Hawk
 import io.reactivex.Completable
 
 class TokenLocalRepository : TokenLocalDataSource {
-    override fun getToken(): Token {
-        val token = Hawk.get<String>(TOKEN)
+    override fun getToken(): Token? {
+        val token = Hawk.get<String?>(TOKEN, null)
         return Token(token)
     }
 
