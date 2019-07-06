@@ -4,6 +4,7 @@ import br.com.esdrasdl.challenge.domain.model.BasicUserInfo
 import br.com.esdrasdl.challenge.domain.model.Token
 import br.com.esdrasdl.challenge.domain.repository.UserRepository
 import io.reactivex.Observable
+import io.reactivex.Single
 
 class UserRepo(
     private val localSource: UserLocalDataSource,
@@ -21,7 +22,7 @@ class UserRepo(
         return localSource.hasUserInfo()
     }
 
-    override fun loadUserInfo(): Observable<BasicUserInfo> {
+    override fun loadUserInfo(): Single<BasicUserInfo> {
         return localSource.loadUserInfo()
     }
 }
