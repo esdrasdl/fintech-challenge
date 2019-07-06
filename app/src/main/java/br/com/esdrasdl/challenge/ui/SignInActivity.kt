@@ -7,13 +7,16 @@ import android.view.MotionEvent
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import br.com.esdrasdl.challenge.AppSchedulerProvider
 import br.com.esdrasdl.challenge.BuildConfig
 import br.com.esdrasdl.challenge.R
 import br.com.esdrasdl.challenge.data.login.UserRepo
 import br.com.esdrasdl.challenge.domain.exception.InvalidCredentialException
+import br.com.esdrasdl.challenge.domain.shared.ViewState
 import br.com.esdrasdl.challenge.domain.usecase.GetToken
 import br.com.esdrasdl.challenge.local.repository.UserLocalRepository
+import br.com.esdrasdl.challenge.presentation.viewmodel.SignInViewModel
 import br.com.esdrasdl.challenge.remote.api.UserAPI
 import br.com.esdrasdl.challenge.remote.repository.UserRemoteRepository
 import br.com.esdrasdl.challenge.remote.service.ApiServiceFactory
@@ -42,15 +45,23 @@ class SignInActivity : AppCompatActivity() {
     @BindView(R.id.sign_in_continue_button)
     lateinit var doLoginButton: MaterialButton
 
-    private var useCase: GetToken? = null
+    private var viewModel: SignInViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
         ButterKnife.bind(this)
-        val repository = loadUserRepository()
-        useCase = GetToken(repository = repository, executor = AppSchedulerProvider())
 
+        setupUI()
+
+        val repository = loadUserRepository()
+        val useCase = GetToken(repository = repository, executor = AppSchedulerProvider())
+        viewModel = SignInViewModel(useCase)
+
+        handleState()
+    }
+
+    private fun setupUI() {
         userNameField.setRightDrawable(ContextCompat.getDrawable(this, R.drawable.ic_cancel_black_24dp))
         userNameField.makeClearable {
             userNameLayout.error = null
@@ -63,38 +74,39 @@ class SignInActivity : AppCompatActivity() {
         }
     }
 
-    @OnClick(R.id.sign_in_continue_button)
-    fun onLoginClick() {
-        doLoginButton.isEnabled = false
-        doLoginButton.text = getString(R.string.waiting)
-        userNameLayout.error = null
-        passwordLayout.error = null
+    private fun handleState() {
+        lifecycle.addObserver(viewModel!!)
+        viewModel?.getState()?.observe(this, Observer { state ->
+            when (state.status) {
+                ViewState.Status.LOADING -> {
+                    doLoginButton.isEnabled = false
+                    doLoginButton.text = getString(R.string.waiting)
+                    userNameLayout.error = null
+                    passwordLayout.error = null
+                }
 
-        useCase?.execute(
-            GetToken.Params(
-                username = userNameField.text.toString(),
-                password = passwordField.text.toString()
-            ),
-            onNext = {
-                Log.d(TAG, it.token.accessToken)
-            },
-            onError = {
-                doLoginButton.isEnabled = true
-                doLoginButton.text = getString(R.string.continue_login)
+                ViewState.Status.ERROR -> {
+                    doLoginButton.isEnabled = true
+                    doLoginButton.text = getString(R.string.continue_login)
 
-                when (it) {
-                    is InvalidCredentialException -> {
+                    if (state.error is InvalidCredentialException) {
                         userNameLayout.error = getString(R.string.wrong_credential_error_message)
                         passwordLayout.error = getString(R.string.wrong_credential_error_message)
                     }
                 }
+                ViewState.Status.SUCCESS -> {
+                    Log.d(TAG, state.data.toString())
+                }
             }
-        )
+        })
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        useCase?.dispose()
+    @OnClick(R.id.sign_in_continue_button)
+    fun onLoginClick() {
+        viewModel?.login(
+            username = userNameField.text.toString(),
+            password = passwordField.text.toString()
+        )
     }
 
     // TODO: Use DI to inject it!

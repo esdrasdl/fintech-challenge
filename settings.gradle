@@ -1,2 +1,2 @@
-include ':app',':domain',':data-remote',':data', ':data-local'
+include ':app',':domain',':data-remote',':data', ':data-local',':presentation'
 rootProject.name='Fintech Challenge'
