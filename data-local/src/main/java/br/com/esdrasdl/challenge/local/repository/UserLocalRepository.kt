@@ -5,7 +5,6 @@ import br.com.esdrasdl.challenge.domain.model.BasicUserInfo
 import br.com.esdrasdl.challenge.local.model.UserInfo
 import com.google.gson.Gson
 import com.orhanobut.hawk.Hawk
-import io.reactivex.Completable
 import io.reactivex.Single
 
 class UserLocalRepository(private val gson: Gson) : UserLocalDataSource {
@@ -14,17 +13,10 @@ class UserLocalRepository(private val gson: Gson) : UserLocalDataSource {
         return Hawk.contains(USER_INFO)
     }
 
-    override fun saveUserInfo(basicUserInfo: BasicUserInfo): Completable {
-        return Completable.create {
-            try {
-                val data = UserInfo(userName = basicUserInfo.userName, password = basicUserInfo.password)
-                val json = gson.toJson(data)
-                Hawk.put(USER_INFO, json)
-                it.onComplete()
-            } catch (e: IllegalStateException) {
-                it.onError(e)
-            }
-        }
+    override fun saveUserInfo(basicUserInfo: BasicUserInfo) {
+        val data = UserInfo(userName = basicUserInfo.userName, password = basicUserInfo.password)
+        val json = gson.toJson(data)
+        Hawk.put(USER_INFO, json)
     }
 
     override fun loadUserInfo(): Single<BasicUserInfo> {
