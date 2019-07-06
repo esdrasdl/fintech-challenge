@@ -1,6 +1,7 @@
 package br.com.esdrasdl.challenge.remote.repository
 
 import br.com.esdrasdl.challenge.data.login.UserRemoteDataSource
+import br.com.esdrasdl.challenge.domain.exception.InvalidCredentialException
 import br.com.esdrasdl.challenge.domain.model.Token
 import br.com.esdrasdl.challenge.remote.api.UserAPI
 import io.reactivex.Observable
@@ -21,6 +22,9 @@ class UserRemoteRepository(private val api: UserAPI) : UserRemoteDataSource {
                 200, 201 -> {
                     val body = response.body()!!
                     Token(body.accessToken)
+                }
+                400 -> {
+                    throw InvalidCredentialException()
                 }
                 else -> throw IllegalStateException()
             }

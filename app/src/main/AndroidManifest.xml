@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="br.com.esdrasdl.challenge">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".FintechApp"
         android:allowBackup="false"

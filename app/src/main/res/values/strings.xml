@@ -4,4 +4,5 @@
     <string name="waiting">Aguarde…</string>
     <string name="password_hint">Senha</string>
     <string name="e_mail_hint">E-mail</string>
+    <string name="wrong_credential_error_message">Usuário ou senha inválidos</string>
 </resources>
