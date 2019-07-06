@@ -3,11 +3,16 @@ package br.com.esdrasdl.challenge.presentation.viewmodel
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import br.com.esdrasdl.challenge.domain.model.Token
 import br.com.esdrasdl.challenge.domain.shared.ViewState
 import br.com.esdrasdl.challenge.domain.usecase.DoLogin
+import br.com.esdrasdl.challenge.domain.usecase.SaveToken
 import br.com.esdrasdl.challenge.presentation.shared.SingleLiveEvent
 
-class SignInViewModel(private val doLogin: DoLogin) : ViewModel(), LifecycleObserver {
+class SignInViewModel(
+    private val doLogin: DoLogin,
+    private val saveToken: SaveToken
+) : ViewModel(), LifecycleObserver {
 
     private val state: SingleLiveEvent<ViewState<Any>> = SingleLiveEvent()
     fun getState(): LiveData<ViewState<Any>> = state
@@ -20,7 +25,7 @@ class SignInViewModel(private val doLogin: DoLogin) : ViewModel(), LifecycleObse
                 password = password
             ),
             onNext = {
-                state.value = ViewState(ViewState.Status.SUCCESS, it.token)
+                saveToken(it.token)
             },
             onError = {
                 state.value = ViewState(status = ViewState.Status.ERROR, error = it)
@@ -28,9 +33,20 @@ class SignInViewModel(private val doLogin: DoLogin) : ViewModel(), LifecycleObse
         )
     }
 
+    private fun saveToken(token: Token) {
+        saveToken.execute(SaveToken.Param(token = token),
+            onError = {
+
+            },
+            onComplete = {
+                state.value = ViewState(ViewState.Status.SUCCESS, token)
+            }
+        )
+    }
+
     override fun onCleared() {
         super.onCleared()
         doLogin.dispose()
+        saveToken.dispose()
     }
-
 }

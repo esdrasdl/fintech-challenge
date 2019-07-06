@@ -12,9 +12,12 @@ import br.com.esdrasdl.challenge.AppSchedulerProvider
 import br.com.esdrasdl.challenge.BuildConfig
 import br.com.esdrasdl.challenge.R
 import br.com.esdrasdl.challenge.data.login.UserRepo
+import br.com.esdrasdl.challenge.data.token.TokenRepo
 import br.com.esdrasdl.challenge.domain.exception.InvalidCredentialException
 import br.com.esdrasdl.challenge.domain.shared.ViewState
 import br.com.esdrasdl.challenge.domain.usecase.DoLogin
+import br.com.esdrasdl.challenge.domain.usecase.SaveToken
+import br.com.esdrasdl.challenge.local.repository.TokenLocalRepository
 import br.com.esdrasdl.challenge.local.repository.UserLocalRepository
 import br.com.esdrasdl.challenge.presentation.viewmodel.SignInViewModel
 import br.com.esdrasdl.challenge.remote.api.UserAPI
@@ -55,8 +58,10 @@ class SignInActivity : AppCompatActivity() {
         setupUI()
 
         val repository = loadUserRepository()
-        val useCase = DoLogin(repository = repository, executor = AppSchedulerProvider())
-        viewModel = SignInViewModel(useCase)
+        val schedulerProvider = AppSchedulerProvider()
+        val doLogin = DoLogin(repository = repository, executor = schedulerProvider)
+        val saveToken = SaveToken(repository = loadTokenRepository(), executor = schedulerProvider)
+        viewModel = SignInViewModel(doLogin, saveToken)
 
         handleState()
     }
@@ -119,6 +124,11 @@ class SignInActivity : AppCompatActivity() {
         val remoteRepository = UserRemoteRepository(api)
         val localRepository = UserLocalRepository(GsonBuilder().create())
         return UserRepo(localRepository, remoteRepository)
+    }
+
+    private fun loadTokenRepository(): TokenRepo {
+        val local = TokenLocalRepository()
+        return TokenRepo(local)
     }
 
     private fun EditText.setRightDrawable(drawable: Drawable?) {

@@ -1,17 +1,21 @@
 package br.com.esdrasdl.challenge.local.repository
 
+import br.com.esdrasdl.challenge.data.token.TokenLocalDataSource
 import br.com.esdrasdl.challenge.domain.model.Token
-import br.com.esdrasdl.challenge.domain.repository.TokenRepository
 import com.orhanobut.hawk.Hawk
+import io.reactivex.Completable
 
-class TokenLocalRepository : TokenRepository {
+class TokenLocalRepository : TokenLocalDataSource {
     override fun getToken(): Token {
         val token = Hawk.get<String>(TOKEN)
         return Token(token)
     }
 
-    override fun saveToken(token: Token) {
-        Hawk.put(TOKEN, token.accessToken)
+    override fun saveToken(token: Token): Completable {
+        return Completable.create {
+            Hawk.put(TOKEN, token.accessToken)
+            it.onComplete()
+        }
     }
 
     companion object {
