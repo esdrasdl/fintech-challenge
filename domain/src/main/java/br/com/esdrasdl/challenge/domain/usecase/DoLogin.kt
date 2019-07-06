@@ -6,8 +6,8 @@ import br.com.esdrasdl.challenge.domain.repository.UserRepository
 import br.com.esdrasdl.challenge.domain.usecase.shared.ObservableUseCase
 import io.reactivex.Observable
 
-class GetToken(private val repository: UserRepository, executor: SchedulerProvider) :
-    ObservableUseCase<GetToken.Params, GetToken.Result>(executor) {
+class DoLogin(private val repository: UserRepository, executor: SchedulerProvider) :
+    ObservableUseCase<DoLogin.Params, DoLogin.Result>(executor) {
 
     override fun buildUseCaseObservable(params: Params?): Observable<Result> {
         if (params == null) throw IllegalStateException()

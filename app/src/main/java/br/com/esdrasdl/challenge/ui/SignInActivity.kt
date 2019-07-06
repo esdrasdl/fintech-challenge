@@ -14,7 +14,7 @@ import br.com.esdrasdl.challenge.R
 import br.com.esdrasdl.challenge.data.login.UserRepo
 import br.com.esdrasdl.challenge.domain.exception.InvalidCredentialException
 import br.com.esdrasdl.challenge.domain.shared.ViewState
-import br.com.esdrasdl.challenge.domain.usecase.GetToken
+import br.com.esdrasdl.challenge.domain.usecase.DoLogin
 import br.com.esdrasdl.challenge.local.repository.UserLocalRepository
 import br.com.esdrasdl.challenge.presentation.viewmodel.SignInViewModel
 import br.com.esdrasdl.challenge.remote.api.UserAPI
@@ -55,7 +55,7 @@ class SignInActivity : AppCompatActivity() {
         setupUI()
 
         val repository = loadUserRepository()
-        val useCase = GetToken(repository = repository, executor = AppSchedulerProvider())
+        val useCase = DoLogin(repository = repository, executor = AppSchedulerProvider())
         viewModel = SignInViewModel(useCase)
 
         handleState()
