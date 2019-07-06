@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 object ApiServiceFactory {
 
-    fun <T> create(clazz: Class<T>, endpoint: String, client: OkHttpClient): T {
+    fun <T> create(clazz: Class<T>, endpoint: String = DEFAULT_BASE_URL, client: OkHttpClient): T {
         val retrofit = Retrofit.Builder()
             .baseUrl(endpoint)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -22,16 +22,22 @@ object ApiServiceFactory {
     }
 
     fun makeOkHttpClient(
-        httpLoggingInterceptor: HttpLoggingInterceptor,
-        authInterceptor: AuthInterceptor
+        httpLoggingInterceptor: HttpLoggingInterceptor? = null,
+        authInterceptor: AuthInterceptor? = null
     ): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(authInterceptor)
+        val builder = OkHttpClient.Builder()
             .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
             .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-            .addInterceptor(httpLoggingInterceptor)
 
-            .build()
+        authInterceptor?.let {
+            builder.addInterceptor(it)
+        }
+
+        httpLoggingInterceptor?.let {
+            builder.addInterceptor(httpLoggingInterceptor)
+        }
+
+        return builder.build()
     }
 
     fun makeRequestInterceptor(tokenRepository: TokenRepository): AuthInterceptor {
@@ -49,4 +55,7 @@ object ApiServiceFactory {
     }
 
     private const val DEFAULT_TIMEOUT = 30L
+
+    const val LOGIN_BASE_URL = "https://connect-sandbox.moip.com.br/"
+    private const val DEFAULT_BASE_URL = "https://sandbox.moip.com.br/v2/"
 }
