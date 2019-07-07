@@ -12,7 +12,7 @@ class UserRepo(
 ) : UserRepository {
 
     override fun login(username: String, password: String): Observable<Token> {
-        return remoteSource.login(username, password).doOnNext() {
+        return remoteSource.login(username, password).doOnNext {
             localSource.saveUserInfo(BasicUserInfo(username, password))
         }
     }

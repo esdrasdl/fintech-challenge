@@ -29,8 +29,10 @@ class OrderListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_list)
         ButterKnife.bind(this)
+        val shouldDoLogin = intent?.getBooleanExtra(EXTRA_DO_LOGIN, false) ?: false
 
         handleState()
+        viewModel.init(shouldDoLogin)
     }
 
     private fun handleState() {
@@ -58,5 +60,9 @@ class OrderListActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    companion object {
+        const val EXTRA_DO_LOGIN = "br.com.esdrasdl.challenge.extra.EXTRA_DO_LOGIN"
     }
 }

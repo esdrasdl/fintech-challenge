@@ -15,6 +15,7 @@ import br.com.esdrasdl.challenge.domain.repository.TokenRepository
 import br.com.esdrasdl.challenge.domain.repository.UserRepository
 import br.com.esdrasdl.challenge.domain.usecase.DoLogin
 import br.com.esdrasdl.challenge.domain.usecase.GetOrders
+import br.com.esdrasdl.challenge.domain.usecase.LoadUserInfo
 import br.com.esdrasdl.challenge.domain.usecase.SaveToken
 import br.com.esdrasdl.challenge.local.repository.TokenLocalRepository
 import br.com.esdrasdl.challenge.local.repository.UserLocalRepository
@@ -84,6 +85,9 @@ val domainModule = module {
     factory {
         SaveToken(repository = get(), executor = get())
     }
+    factory {
+        LoadUserInfo(repository = get(), executor = get())
+    }
 }
 
 val presentationModule = module {
@@ -91,6 +95,6 @@ val presentationModule = module {
         SignInViewModel(doLogin = get(), saveToken = get())
     }
     viewModel {
-        OrderListViewModel(getOrders = get())
+        OrderListViewModel(getOrders = get(), doLogin = get(), loadUserInfo = get(), saveToken = get())
     }
 }

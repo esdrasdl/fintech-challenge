@@ -14,7 +14,9 @@ class StartActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         if (repository.hasUserInfo()) {
-            startActivity(Intent(this, OrderListActivity::class.java))
+            val intent = Intent(this, OrderListActivity::class.java)
+            intent.putExtra(OrderListActivity.EXTRA_DO_LOGIN, true)
+            startActivity(intent)
         } else {
             startActivity(Intent(this, SignInActivity::class.java))
         }
