@@ -9,7 +9,7 @@ import io.reactivex.Observable
 class GetOrders(private val repository: OrderRepository, executor: SchedulerProvider) :
     ObservableUseCase<Unit, GetOrders.Result>(executor) {
     override fun buildUseCaseObservable(params: Unit?): Observable<Result> {
-        return repository.getOrders().map { Result(it) }
+        return repository.getOrders().map { Result(it.sortedByDescending { it.currentStatusDate }) }
     }
 
     data class Result(val orders: List<Order>)
