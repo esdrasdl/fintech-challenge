@@ -6,18 +6,18 @@ import io.reactivex.Completable
 
 class TokenRepo(private val local: TokenLocalDataSource) : TokenRepository {
 
-    private var tokenCached: Token? = null
+    private var cachedToken: Token? = null
 
     override fun getToken(): Token? {
-        if (tokenCached != null) {
-            tokenCached = local.getToken()
+        if (cachedToken == null) {
+            cachedToken = local.getToken()
         }
 
-        return tokenCached
+        return cachedToken
     }
 
     override fun saveToken(token: Token): Completable {
-        tokenCached = token
+        cachedToken = token
         return local.saveToken(token)
     }
 }
