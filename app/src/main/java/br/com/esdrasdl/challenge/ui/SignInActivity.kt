@@ -8,28 +8,17 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import br.com.esdrasdl.challenge.AppSchedulerProvider
-import br.com.esdrasdl.challenge.BuildConfig
 import br.com.esdrasdl.challenge.R
-import br.com.esdrasdl.challenge.data.login.UserRepo
-import br.com.esdrasdl.challenge.data.token.TokenRepo
 import br.com.esdrasdl.challenge.domain.exception.InvalidCredentialException
 import br.com.esdrasdl.challenge.domain.shared.ViewState
-import br.com.esdrasdl.challenge.domain.usecase.DoLogin
-import br.com.esdrasdl.challenge.domain.usecase.SaveToken
-import br.com.esdrasdl.challenge.local.repository.TokenLocalRepository
-import br.com.esdrasdl.challenge.local.repository.UserLocalRepository
 import br.com.esdrasdl.challenge.presentation.viewmodel.SignInViewModel
-import br.com.esdrasdl.challenge.remote.api.UserAPI
-import br.com.esdrasdl.challenge.remote.repository.UserRemoteRepository
-import br.com.esdrasdl.challenge.remote.service.ApiServiceFactory
 import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.google.gson.GsonBuilder
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SignInActivity : AppCompatActivity() {
 
@@ -48,7 +37,7 @@ class SignInActivity : AppCompatActivity() {
     @BindView(R.id.sign_in_continue_button)
     lateinit var doLoginButton: MaterialButton
 
-    private var viewModel: SignInViewModel? = null
+    private val viewModel: SignInViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,12 +45,6 @@ class SignInActivity : AppCompatActivity() {
         ButterKnife.bind(this)
 
         setupUI()
-
-        val repository = loadUserRepository()
-        val schedulerProvider = AppSchedulerProvider()
-        val doLogin = DoLogin(repository = repository, executor = schedulerProvider)
-        val saveToken = SaveToken(repository = loadTokenRepository(), executor = schedulerProvider)
-        viewModel = SignInViewModel(doLogin, saveToken)
 
         handleState()
     }
@@ -80,8 +63,8 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun handleState() {
-        lifecycle.addObserver(viewModel!!)
-        viewModel?.getState()?.observe(this, Observer { state ->
+        lifecycle.addObserver(viewModel)
+        viewModel.getState().observe(this, Observer { state ->
             when (state.status) {
                 ViewState.Status.LOADING -> {
                     doLoginButton.isEnabled = false
@@ -109,29 +92,10 @@ class SignInActivity : AppCompatActivity() {
 
     @OnClick(R.id.sign_in_continue_button)
     fun onLoginClick() {
-        viewModel?.login(
+        viewModel.login(
             username = userNameField.text.toString(),
             password = passwordField.text.toString()
         )
-    }
-
-    // TODO: Use DI to inject it!
-    private fun loadUserRepository(): UserRepo {
-        val authInterceptor = ApiServiceFactory.makeRequestInterceptor(TokenRepo(TokenLocalRepository()))
-
-        val client = ApiServiceFactory.makeOkHttpClient(
-            httpLoggingInterceptor = ApiServiceFactory.makeLoggingInterceptor(BuildConfig.DEBUG),
-            authInterceptor = authInterceptor
-        )
-        val api = ApiServiceFactory.create(UserAPI::class.java, ApiServiceFactory.LOGIN_BASE_URL, client)
-        val remoteRepository = UserRemoteRepository(api)
-        val localRepository = UserLocalRepository(GsonBuilder().create())
-        return UserRepo(localRepository, remoteRepository)
-    }
-
-    private fun loadTokenRepository(): TokenRepo {
-        val local = TokenLocalRepository()
-        return TokenRepo(local)
     }
 
     private fun EditText.setRightDrawable(drawable: Drawable?) {
