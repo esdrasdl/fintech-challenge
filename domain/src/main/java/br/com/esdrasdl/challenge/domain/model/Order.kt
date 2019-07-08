@@ -5,7 +5,7 @@ import java.util.Date
 data class Order(
     val ownId: String,
     val id: String,
-    val operation: OperationType? = null,
+    val operation: OperationType,
     val buyerName: String,
     val buyerEmail: String,
     val createdAt: Date,
@@ -38,5 +38,4 @@ enum class OperationType(val value: String) {
         private val map = values().associateBy(OperationType::value)
         fun fromString(type: String) = map[type.toLowerCase()] ?: CREDIT_CARD
     }
-
 }

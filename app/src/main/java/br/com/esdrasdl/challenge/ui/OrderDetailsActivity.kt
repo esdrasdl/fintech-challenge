@@ -13,6 +13,8 @@ import br.com.esdrasdl.challenge.domain.model.OperationType
 import br.com.esdrasdl.challenge.domain.model.Order
 import br.com.esdrasdl.challenge.domain.model.OrderStatus
 import br.com.esdrasdl.challenge.domain.shared.ViewState
+import br.com.esdrasdl.challenge.mapper.OrderMapper
+import br.com.esdrasdl.challenge.model.OrderDetailsData
 import br.com.esdrasdl.challenge.presentation.viewmodel.OrderDetailsViewModel
 import butterknife.BindView
 import butterknife.ButterKnife
@@ -66,6 +68,8 @@ class OrderDetailsActivity : AppCompatActivity() {
     @BindView(R.id.order_detail_payment_amount)
     lateinit var paymentNumbersView: TextView
 
+    var detailsData: OrderDetailsData? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_details)
@@ -77,8 +81,19 @@ class OrderDetailsActivity : AppCompatActivity() {
         val id = intent?.getStringExtra(EXTRA_ORDER_ID) ?: ""
         handleState()
 
-        viewModel.init(id)
+        if (savedInstanceState == null) {
+            viewModel.init(id)
+        } else if (savedInstanceState.containsKey(STATE_ORDER)) {
+            detailsData = savedInstanceState.getParcelable(STATE_ORDER)
+            detailsData?.let {
+                setupOrderDetails(it)
+            }
+        }
+    }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(STATE_ORDER, detailsData)
     }
 
     private fun setupToolbar() {
@@ -108,7 +123,8 @@ class OrderDetailsActivity : AppCompatActivity() {
                 }
                 ViewState.Status.SUCCESS -> {
                     val order = state.data as Order
-                    setupOrderDetails(order)
+                    detailsData = OrderMapper.fromDomain(order)
+                    setupOrderDetails(detailsData!!)
                 }
                 ViewState.Status.ERROR -> {
 
@@ -118,7 +134,7 @@ class OrderDetailsActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun setupOrderDetails(order: Order) {
+    private fun setupOrderDetails(order: OrderDetailsData) {
         val moneyFormatter = FormatadorValor.VALOR_COM_SIMBOLO
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.US)
         orderDetailIdView.text = order.id
@@ -126,7 +142,7 @@ class OrderDetailsActivity : AppCompatActivity() {
         totalAmountView.text = moneyFormatter.formata(order.totalAmount.toString())
         buyerNameView.text = order.buyerName
         buyerEmailView.text = order.buyerEmail
-        statusView.text = when (order.currentStatus) {
+        statusView.text = when (OrderStatus.fromString(order.currentStatus)) {
             OrderStatus.PAID -> getString(R.string.order_status_paid)
             OrderStatus.WAITING -> getString(R.string.order_status_waiting)
             OrderStatus.REVERTED -> getString(R.string.order_status_reverted)
@@ -141,15 +157,14 @@ class OrderDetailsActivity : AppCompatActivity() {
         val numberOfPayments = order.numberOfPayments ?: 1
         paymentNumbersView.text =
             resources.getQuantityString(R.plurals.payments, numberOfPayments, numberOfPayments)
-        paymentMethodView.text =
-            if (order.operation == OperationType.BOLETO) {
-                getString(R.string.boleto)
-            } else {
-                getString(R.string.credit_card)
-            }
+        paymentMethodView.text = when (OperationType.fromString(order.operation)) {
+            OperationType.BOLETO -> getString(R.string.boleto)
+            OperationType.CREDIT_CARD -> getString(R.string.credit_card)
+        }
     }
 
     companion object {
         const val EXTRA_ORDER_ID = "br.com.esdrasdl.challenge.extra.EXTRA_ORDER_ID"
+        private const val STATE_ORDER = "STATE_ORDER"
     }
 }

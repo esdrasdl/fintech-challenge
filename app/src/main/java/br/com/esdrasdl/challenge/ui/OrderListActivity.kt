@@ -26,6 +26,10 @@ class OrderListActivity : AppCompatActivity() {
 
     private val viewModel: OrderListViewModel by viewModel()
 
+    private var listOfOrderItem = ArrayList<OrderItem>()
+
+    private var adapter: OrderListAdapter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_list)
@@ -33,7 +37,17 @@ class OrderListActivity : AppCompatActivity() {
         val shouldDoLogin = intent?.getBooleanExtra(EXTRA_DO_LOGIN, false) ?: false
 
         handleState()
-        viewModel.init(shouldDoLogin)
+        if (savedInstanceState == null) {
+            viewModel.init(shouldDoLogin)
+        } else {
+            listOfOrderItem = savedInstanceState.getParcelableArrayList(STATE_ORDER_LIST)
+            setupRecyclerView(listOfOrderItem)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelableArrayList(STATE_ORDER_LIST, listOfOrderItem)
     }
 
     private fun handleState() {
@@ -45,22 +59,22 @@ class OrderListActivity : AppCompatActivity() {
                 }
                 ViewState.Status.SUCCESS -> {
                     progress.hide()
-                    val list = state.data as List<Order>
-                    recyclerView.adapter = OrderListAdapter(
-                        list.map {
-                            OrderItem(
-                                it.id,
-                                it.ownId,
-                                it.buyerEmail,
-                                it.currentStatus.value,
-                                it.currentStatusDate,
-                                it.totalAmount
-                            )
-                        }) { id ->
-                        val intent = Intent(this, OrderDetailsActivity::class.java)
-                        intent.putExtra(OrderDetailsActivity.EXTRA_ORDER_ID, id)
-                        startActivity(intent)
+                    val listOfOrders = state.data as List<Order>
+
+                    listOfOrderItem = listOfOrders.map {
+                        OrderItem(
+                            it.id,
+                            it.ownId,
+                            it.buyerEmail,
+                            it.currentStatus.value,
+                            it.currentStatusDate,
+                            it.totalAmount
+                        )
+                    }.let {
+                        ArrayList(it)
                     }
+
+                    setupRecyclerView(listOfOrderItem)
                 }
                 ViewState.Status.ERROR -> {
                     progress.hide()
@@ -68,8 +82,18 @@ class OrderListActivity : AppCompatActivity() {
             }
         })
     }
+    ;
+    private fun setupRecyclerView(list: java.util.ArrayList<OrderItem>) {
+        adapter = OrderListAdapter(list) { id ->
+            val intent = Intent(this, OrderDetailsActivity::class.java)
+            intent.putExtra(OrderDetailsActivity.EXTRA_ORDER_ID, id)
+            startActivity(intent)
+        }
+        recyclerView.adapter = adapter
+    }
 
     companion object {
         const val EXTRA_DO_LOGIN = "br.com.esdrasdl.challenge.extra.EXTRA_DO_LOGIN"
+        private const val STATE_ORDER_LIST = "STATE_ORDER_LIST"
     }
 }

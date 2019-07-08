@@ -33,7 +33,6 @@ class OrderListAdapter(
         holder.bind(list[position])
     }
 
-
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         @BindView(R.id.order_item_value)
