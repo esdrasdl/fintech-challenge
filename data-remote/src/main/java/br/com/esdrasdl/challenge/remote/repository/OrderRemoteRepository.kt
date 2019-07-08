@@ -3,7 +3,7 @@ package br.com.esdrasdl.challenge.remote.repository
 import br.com.esdrasdl.challenge.data.order.OrderRemoteDataSource
 import br.com.esdrasdl.challenge.domain.model.Order
 import br.com.esdrasdl.challenge.remote.api.OrderAPI
-import br.com.esdrasdl.challenge.remote.mapper.SimpleOrderMapper
+import br.com.esdrasdl.challenge.remote.mapper.OrderMapper
 import io.reactivex.Observable
 
 class OrderRemoteRepository(private val api: OrderAPI) : OrderRemoteDataSource {
@@ -12,7 +12,7 @@ class OrderRemoteRepository(private val api: OrderAPI) : OrderRemoteDataSource {
             when (response.code()) {
                 200, 201 -> {
                     val body = response.body()!!
-                    val list = body.orders.map { SimpleOrderMapper.toDomain(it) }
+                    val list = body.orders.map { OrderMapper.toDomain(it) }
                     list
                 }
 
@@ -27,7 +27,7 @@ class OrderRemoteRepository(private val api: OrderAPI) : OrderRemoteDataSource {
             when (response.code()) {
                 200, 201 -> {
                     val body = response.body()!!
-                    val result = SimpleOrderMapper.toDomain(body)
+                    val result = OrderMapper.toDomain(body)
                     result
                 }
 

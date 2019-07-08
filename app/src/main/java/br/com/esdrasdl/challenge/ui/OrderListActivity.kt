@@ -49,7 +49,7 @@ class OrderListActivity : AppCompatActivity() {
                         OrderItem(
                             it.ownId,
                             it.buyerEmail,
-                            it.currentStatus,
+                            it.currentStatus.value,
                             it.currentStatusDate,
                             it.totalAmount
                         )

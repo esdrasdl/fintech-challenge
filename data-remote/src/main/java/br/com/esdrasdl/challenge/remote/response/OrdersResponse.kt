@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class OrdersResponse(
     @SerializedName("summary") val summary: SummaryResponse,
-    @SerializedName("orders") val orders: List<SimpleOrderResponse>
+    @SerializedName("orders") val orders: List<OrderResponse>
 )
 
 data class SummaryResponse(
@@ -12,7 +12,7 @@ data class SummaryResponse(
     @SerializedName("amount") val amount: Int
 )
 
-data class SimpleOrderResponse(
+data class OrderResponse(
     @SerializedName("id") val id: String,
     @SerializedName("ownId") val ownId: String,
     @SerializedName("status") val status: String,
@@ -20,8 +20,9 @@ data class SimpleOrderResponse(
     @SerializedName("amount") val amount: AmountResponse,
     @SerializedName("customer") val customer: CustomerResponse,
     @SerializedName("createdAt") val createdAt: String,
-    @SerializedName("updatedAt") val updatedAt: String
-    )
+    @SerializedName("updatedAt") val updatedAt: String,
+    @SerializedName("payments") val payments: List<PaymentResponse>
+)
 
 data class AmountResponse(
     @SerializedName("total") val total: Int,
@@ -31,6 +32,17 @@ data class AmountResponse(
     @SerializedName("otherReceivers") val otherReceivers: Int,
     @SerializedName("currency") val currency: String,
     @SerializedName("liquid") val liquid: Int
+)
+
+data class PaymentResponse(
+    @SerializedName("id") val id: String,
+    @SerializedName("status") val status: String,
+    @SerializedName("installmentCount") val installmentCount: Int,
+    @SerializedName("fundingInstrument") val fundingInstrument: FundingInstrumentResponse
+)
+
+data class FundingInstrumentResponse(
+    @SerializedName("method") val method: String
 )
 
 data class CustomerResponse(

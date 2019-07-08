@@ -9,7 +9,7 @@ data class Order(
     val buyerName: String,
     val buyerEmail: String,
     val createdAt: Date,
-    val currentStatus: String,
+    val currentStatus: OrderStatus,
     val currentStatusDate: Date,
     val totalAmount: Double,
     val fee: Double? = null,
@@ -17,13 +17,26 @@ data class Order(
     val numberOfPayments: Int? = null
 )
 
+enum class OrderStatus(val value: String) {
+    CREATED("created"),
+    WAITING("waiting"),
+    PAID("paid"),
+    NOT_PAID("not_paid"),
+    REVERTED("reverted");
+
+    companion object {
+        private val map = values().associateBy(OrderStatus::value)
+        fun fromString(type: String) = map[type.toLowerCase()] ?: WAITING
+    }
+}
+
 enum class OperationType(val value: String) {
-    DEBIT("debit"),
-    CREDIT("credit");
+    BOLETO("boleto"),
+    CREDIT_CARD("credit_card");
 
     companion object {
         private val map = values().associateBy(OperationType::value)
-        fun fromString(type: String) = map[type] ?: DEBIT
+        fun fromString(type: String) = map[type.toLowerCase()] ?: CREDIT_CARD
     }
 
 }
