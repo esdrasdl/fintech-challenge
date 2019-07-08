@@ -2,8 +2,9 @@ package br.com.esdrasdl.challenge.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.ContentLoadingProgressBar
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import br.com.esdrasdl.challenge.R
@@ -22,7 +23,7 @@ class OrderListActivity : AppCompatActivity() {
     lateinit var recyclerView: RecyclerView
 
     @BindView(R.id.order_progressbar)
-    lateinit var progress: ContentLoadingProgressBar
+    lateinit var progress: ProgressBar
 
     private val viewModel: OrderListViewModel by viewModel()
 
@@ -55,10 +56,11 @@ class OrderListActivity : AppCompatActivity() {
         viewModel.getState().observe(this, Observer { state ->
             when (state.status) {
                 ViewState.Status.LOADING -> {
-                    progress.show()
+                    progress.visibility = View.VISIBLE
                 }
                 ViewState.Status.SUCCESS -> {
-                    progress.hide()
+                    progress.visibility = View.GONE
+
                     val listOfOrders = state.data as List<Order>
 
                     listOfOrderItem = listOfOrders.map {
@@ -77,7 +79,7 @@ class OrderListActivity : AppCompatActivity() {
                     setupRecyclerView(listOfOrderItem)
                 }
                 ViewState.Status.ERROR -> {
-                    progress.hide()
+                    progress.visibility = View.GONE
                 }
             }
         })
