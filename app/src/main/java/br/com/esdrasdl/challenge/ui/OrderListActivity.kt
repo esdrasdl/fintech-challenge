@@ -1,5 +1,6 @@
 package br.com.esdrasdl.challenge.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.ContentLoadingProgressBar
@@ -45,15 +46,21 @@ class OrderListActivity : AppCompatActivity() {
                 ViewState.Status.SUCCESS -> {
                     progress.hide()
                     val list = state.data as List<Order>
-                    recyclerView.adapter = OrderListAdapter(list.map {
-                        OrderItem(
-                            it.ownId,
-                            it.buyerEmail,
-                            it.currentStatus.value,
-                            it.currentStatusDate,
-                            it.totalAmount
-                        )
-                    })
+                    recyclerView.adapter = OrderListAdapter(
+                        list.map {
+                            OrderItem(
+                                it.id,
+                                it.ownId,
+                                it.buyerEmail,
+                                it.currentStatus.value,
+                                it.currentStatusDate,
+                                it.totalAmount
+                            )
+                        }) { id ->
+                        val intent = Intent(this, OrderDetailsActivity::class.java)
+                        intent.putExtra(OrderDetailsActivity.EXTRA_ORDER_ID, id)
+                        startActivity(intent)
+                    }
                 }
                 ViewState.Status.ERROR -> {
                     progress.hide()

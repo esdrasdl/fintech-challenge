@@ -14,11 +14,13 @@ import br.com.esdrasdl.challenge.domain.repository.OrderRepository
 import br.com.esdrasdl.challenge.domain.repository.TokenRepository
 import br.com.esdrasdl.challenge.domain.repository.UserRepository
 import br.com.esdrasdl.challenge.domain.usecase.DoLogin
+import br.com.esdrasdl.challenge.domain.usecase.GetOrderById
 import br.com.esdrasdl.challenge.domain.usecase.GetOrders
 import br.com.esdrasdl.challenge.domain.usecase.LoadUserInfo
 import br.com.esdrasdl.challenge.domain.usecase.SaveToken
 import br.com.esdrasdl.challenge.local.repository.TokenLocalRepository
 import br.com.esdrasdl.challenge.local.repository.UserLocalRepository
+import br.com.esdrasdl.challenge.presentation.viewmodel.OrderDetailsViewModel
 import br.com.esdrasdl.challenge.presentation.viewmodel.OrderListViewModel
 import br.com.esdrasdl.challenge.presentation.viewmodel.SignInViewModel
 import br.com.esdrasdl.challenge.remote.api.OrderAPI
@@ -88,6 +90,9 @@ val domainModule = module {
     factory {
         LoadUserInfo(repository = get(), executor = get())
     }
+    factory {
+        GetOrderById(repository = get(), executor = get())
+    }
 }
 
 val presentationModule = module {
@@ -96,5 +101,8 @@ val presentationModule = module {
     }
     viewModel {
         OrderListViewModel(getOrders = get(), doLogin = get(), loadUserInfo = get(), saveToken = get())
+    }
+    viewModel {
+        OrderDetailsViewModel(getOrderById = get())
     }
 }

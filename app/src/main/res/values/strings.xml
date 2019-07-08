@@ -5,4 +5,23 @@
     <string name="password_hint">Senha</string>
     <string name="e_mail_hint">E-mail</string>
     <string name="wrong_credential_error_message">Usuário ou senha inválidos</string>
+    <string name="buyer_label">Comprador</string>
+    <string name="created_at">Criado em</string>
+    <string name="status">Status</string>
+    <string name="resume">Resumo Financeiro</string>
+    <string name="total_vallue">Valor Total</string>
+    <string name="fee">Taxas</string>
+    <string name="liquid_value">Meu recebimento</string>
+    <string name="payments">Pagamentos</string>
+    <string name="boleto">Boleto</string>
+    <string name="credit_card">Cartão de crédito</string>
+    <string name="order_status_paid">Pago</string>
+    <string name="order_status_waiting">Aguardando</string>
+    <string name="order_status_reverted">Estornado</string>
+    <string name="order_status_created">Criado</string>
+    <string name="order_status_not_paid">Não Pago</string>
+    <plurals name="payments">
+        <item quantity="one">%d pagamento</item>
+        <item quantity="other">%d pagamentos</item>
+    </plurals>
 </resources>
