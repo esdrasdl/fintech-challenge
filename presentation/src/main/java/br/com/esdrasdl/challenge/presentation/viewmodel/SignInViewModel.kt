@@ -15,6 +15,7 @@ class SignInViewModel(
 ) : ViewModel(), LifecycleObserver {
 
     private val state: SingleLiveEvent<ViewState<Any>> = SingleLiveEvent()
+
     fun getState(): LiveData<ViewState<Any>> = state
 
     fun login(username: String, password: String) {
