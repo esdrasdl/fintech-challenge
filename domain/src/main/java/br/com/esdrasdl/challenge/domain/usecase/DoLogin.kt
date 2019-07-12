@@ -1,5 +1,6 @@
 package br.com.esdrasdl.challenge.domain.usecase
 
+import br.com.esdrasdl.challenge.domain.exception.EmptyInputException
 import br.com.esdrasdl.challenge.domain.executor.SchedulerProvider
 import br.com.esdrasdl.challenge.domain.model.Token
 import br.com.esdrasdl.challenge.domain.repository.UserRepository
@@ -10,7 +11,7 @@ class DoLogin(private val repository: UserRepository, executor: SchedulerProvide
     ObservableUseCase<DoLogin.Params, DoLogin.Result>(executor) {
 
     override fun buildUseCaseObservable(params: Params?): Observable<Result> {
-        if (params == null) throw IllegalStateException()
+        if (params == null) return Observable.error(EmptyInputException())
 
         return repository.login(params.username, params.password).map {
             Result(it)
