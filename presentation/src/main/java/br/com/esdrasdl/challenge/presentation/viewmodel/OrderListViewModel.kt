@@ -3,6 +3,7 @@ package br.com.esdrasdl.challenge.presentation.viewmodel
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import br.com.esdrasdl.challenge.domain.model.BasicUserInfo
 import br.com.esdrasdl.challenge.domain.shared.ViewState
 import br.com.esdrasdl.challenge.domain.usecase.DoLogin
 import br.com.esdrasdl.challenge.domain.usecase.GetOrders
@@ -28,32 +29,35 @@ class OrderListViewModel(
                     state.value = ViewState(ViewState.Status.LOADING)
                 },
                 onNext = {
-                    doLogin.execute(
-                        DoLogin.Params(it.userInfo.userName, it.userInfo.password),
-                        onNext = {
-                            saveToken.execute(
-                                SaveToken.Param(it.token),
-                                onComplete = {
-                                    loadOrders()
-                                },
-                                onError = {
-                                    state.value = ViewState(ViewState.Status.ERROR, it)
-                                }
-                            )
-                        },
-                        onError = {
-                            state.value = ViewState(ViewState.Status.ERROR, it)
-                        }
-                    )
+                    doSigIn(it.userInfo)
                 },
                 onError = {
                     state.value = ViewState(ViewState.Status.ERROR, it)
                 }
             )
-
         } else {
             loadOrders()
         }
+    }
+
+    private fun doSigIn(userInfo: BasicUserInfo) {
+        doLogin.execute(
+            DoLogin.Params(userInfo.userName, userInfo.password),
+            onNext = {
+                saveToken.execute(
+                    SaveToken.Param(it.token),
+                    onComplete = {
+                        loadOrders()
+                    },
+                    onError = {
+                        state.value = ViewState(ViewState.Status.ERROR, it)
+                    }
+                )
+            },
+            onError = {
+                state.value = ViewState(ViewState.Status.ERROR, it)
+            }
+        )
     }
 
     private fun loadOrders() {
@@ -73,5 +77,8 @@ class OrderListViewModel(
     override fun onCleared() {
         super.onCleared()
         getOrders.dispose()
+        doLogin.dispose()
+        loadUserInfo.dispose()
+        saveToken.dispose()
     }
 }
