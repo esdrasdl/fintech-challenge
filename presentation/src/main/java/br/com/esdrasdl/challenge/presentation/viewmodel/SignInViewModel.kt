@@ -3,6 +3,7 @@ package br.com.esdrasdl.challenge.presentation.viewmodel
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import br.com.esdrasdl.challenge.domain.exception.InvalidCredentialException
 import br.com.esdrasdl.challenge.domain.model.Token
 import br.com.esdrasdl.challenge.domain.shared.ViewState
 import br.com.esdrasdl.challenge.domain.usecase.DoLogin
@@ -19,21 +20,25 @@ class SignInViewModel(
     fun getState(): LiveData<ViewState<Any>> = state
 
     fun login(username: String, password: String) {
-        doLogin.execute(
-            DoLogin.Params(
-                username = username,
-                password = password
-            ),
-            doOnSubscribe = {
-                state.value = ViewState(ViewState.Status.LOADING)
-            },
-            onNext = {
-                saveToken(it.token)
-            },
-            onError = {
-                state.value = ViewState(status = ViewState.Status.ERROR, error = it)
-            }
-        )
+        if (username.isBlank() || password.isBlank()) {
+            state.value = ViewState(ViewState.Status.ERROR, error = InvalidCredentialException())
+        } else {
+            doLogin.execute(
+                DoLogin.Params(
+                    username = username,
+                    password = password
+                ),
+                doOnSubscribe = {
+                    state.value = ViewState(ViewState.Status.LOADING)
+                },
+                onNext = {
+                    saveToken(it.token)
+                },
+                onError = {
+                    state.value = ViewState(status = ViewState.Status.ERROR, error = it)
+                }
+            )
+        }
     }
 
     private fun saveToken(token: Token) {

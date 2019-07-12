@@ -178,4 +178,25 @@ class SignInViewModelTest {
         assertEquals(ViewState.Status.ERROR, value.status)
         assertThat(value.error, Is(instanceOf(InvalidCredentialException::class.java)))
     }
+
+    @Test
+    fun testLoginREmptyUserInfoError() {
+
+        val username = ""
+        val password = ""
+        viewModel.login(username, password)
+
+        verify(doLogin, times(0)).execute(
+            params = eq(DoLogin.Params(username, password)),
+            doOnSubscribe = any(),
+            onNext = any(),
+            onError = any(),
+            onComplete = eq(null)
+        )
+
+        val value = viewModel.getState().value!!
+
+        assertEquals(ViewState.Status.ERROR, value.status)
+        assertThat(value.error, Is(instanceOf(InvalidCredentialException::class.java)))
+    }
 }

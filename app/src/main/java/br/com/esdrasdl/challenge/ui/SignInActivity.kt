@@ -78,8 +78,8 @@ class SignInActivity : AppCompatActivity() {
                     doLoginButton.text = getString(R.string.continue_login)
 
                     if (state.error is InvalidCredentialException) {
-                        userNameLayout.error = getString(R.string.wrong_credential_error_message)
-                        passwordLayout.error = getString(R.string.wrong_credential_error_message)
+                        userNameLayout.error = getString(R.string.wrong_credential_error_user_message)
+                        passwordLayout.error = getString(R.string.wrong_credential_error_password_message)
                     }
                 }
                 ViewState.Status.SUCCESS -> {

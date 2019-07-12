@@ -4,7 +4,8 @@
     <string name="waiting">Aguarde…</string>
     <string name="password_hint">Senha</string>
     <string name="e_mail_hint">E-mail</string>
-    <string name="wrong_credential_error_message">Usuário ou senha inválidos</string>
+    <string name="wrong_credential_error_user_message">Usuário inválido</string>
+    <string name="wrong_credential_error_password_message">Senha inválida</string>
     <string name="buyer_label">Comprador</string>
     <string name="created_at">Criado em</string>
     <string name="status">Status</string>
