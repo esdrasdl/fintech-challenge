@@ -21,6 +21,7 @@
     <string name="order_status_reverted">Estornado</string>
     <string name="order_status_created">Criado</string>
     <string name="order_status_not_paid">Não Pago</string>
+    <string name="sigin_in_error_warning">Usuário ou senha inválidos</string>
     <plurals name="payments">
         <item quantity="one">%d pagamento</item>
         <item quantity="other">%d pagamentos</item>

@@ -1,11 +1,18 @@
 package br.com.esdrasdl.challenge.ui
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.MotionEvent
+import android.view.View
+import android.view.animation.CycleInterpolator
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import br.com.esdrasdl.challenge.R
@@ -17,25 +24,27 @@ import butterknife.ButterKnife
 import butterknife.OnClick
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SignInActivity : AppCompatActivity() {
 
     @BindView(R.id.sign_in_username_container)
-    lateinit var userNameLayout: TextInputLayout
+    lateinit var userNameLayout: LinearLayout
 
     @BindView(R.id.sign_in_username)
-    lateinit var userNameField: TextInputEditText
+    lateinit var userNameField: AppCompatEditText
 
     @BindView(R.id.sign_in_password_container)
-    lateinit var passwordLayout: TextInputLayout
+    lateinit var passwordLayout: LinearLayout
 
     @BindView(R.id.sign_in_password)
     lateinit var passwordField: TextInputEditText
 
     @BindView(R.id.sign_in_continue_button)
     lateinit var doLoginButton: MaterialButton
+
+    @BindView(R.id.sigin_in_error_warning)
+    lateinit var sigInErrorWarning: TextView
 
     private val viewModel: SignInViewModel by viewModel()
 
@@ -50,15 +59,19 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        userNameField.setRightDrawable(ContextCompat.getDrawable(this, R.drawable.ic_cancel_black_24dp))
+        val cleanIcon = ContextCompat.getDrawable(this, R.drawable.ic_cancel_black_24dp)
+        val arrowLeft = ContextCompat.getDrawable(this, R.drawable.ic_arrow_forward_black_24dp)
+        userNameField.setRightDrawable(cleanIcon)
+        doLoginButton.setRightDrawable(arrowLeft)
+
         userNameField.makeClearable {
-            userNameLayout.error = null
+            sigInErrorWarning.visibility = View.GONE
         }
         passwordField.onChange {
-            passwordLayout.error = null
+            sigInErrorWarning.visibility = View.GONE
         }
         userNameField.onChange {
-            userNameLayout.error = null
+            sigInErrorWarning.visibility = View.GONE
         }
     }
 
@@ -69,8 +82,6 @@ class SignInActivity : AppCompatActivity() {
                 ViewState.Status.LOADING -> {
                     doLoginButton.isEnabled = false
                     doLoginButton.text = getString(R.string.waiting)
-                    userNameLayout.error = null
-                    passwordLayout.error = null
                 }
 
                 ViewState.Status.ERROR -> {
@@ -78,8 +89,7 @@ class SignInActivity : AppCompatActivity() {
                     doLoginButton.text = getString(R.string.continue_login)
 
                     if (state.error is InvalidCredentialException) {
-                        userNameLayout.error = getString(R.string.wrong_credential_error_user_message)
-                        passwordLayout.error = getString(R.string.wrong_credential_error_password_message)
+                        shakeError()
                     }
                 }
                 ViewState.Status.SUCCESS -> {
@@ -99,6 +109,11 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun EditText.setRightDrawable(drawable: Drawable?) {
+        drawable?.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+        setCompoundDrawables(null, null, drawable, null)
+    }
+
+    private fun MaterialButton.setRightDrawable(drawable: Drawable?) {
         drawable?.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
         setCompoundDrawables(null, null, drawable, null)
     }
@@ -124,6 +139,25 @@ class SignInActivity : AppCompatActivity() {
             onClear?.invoke()
 
             this.requestFocus()
+        }
+    }
+
+    private fun shakeError() {
+        val set = AnimatorSet()
+        val usernameShake =
+            ObjectAnimator.ofFloat(userNameLayout, "translationX", 0f, 30f).apply {
+                interpolator = CycleInterpolator(3f)
+                duration = 400
+            }
+        val passwordShake =
+            ObjectAnimator.ofFloat(passwordLayout, "translationX", 0f, 30f).apply {
+                interpolator = CycleInterpolator(3f)
+                duration = 400
+            }
+        sigInErrorWarning.visibility = View.VISIBLE
+        set.apply {
+            playTogether(usernameShake, passwordShake)
+            start()
         }
     }
 
