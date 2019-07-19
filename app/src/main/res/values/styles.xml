@@ -12,7 +12,11 @@
 
     <style name="WhiteTextLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/white</item>
+    </style>
 
+    <style name="MaterialButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="colorAccent">@android:color/transparent</item>
     </style>
 
 </resources>

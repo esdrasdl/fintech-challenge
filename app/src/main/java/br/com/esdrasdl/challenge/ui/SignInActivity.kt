@@ -13,8 +13,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import br.com.esdrasdl.challenge.R
 import br.com.esdrasdl.challenge.domain.exception.InvalidCredentialException
 import br.com.esdrasdl.challenge.domain.shared.ViewState
@@ -23,7 +23,6 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SignInActivity : AppCompatActivity() {
@@ -38,7 +37,7 @@ class SignInActivity : AppCompatActivity() {
     lateinit var passwordLayout: LinearLayout
 
     @BindView(R.id.sign_in_password)
-    lateinit var passwordField: TextInputEditText
+    lateinit var passwordField: AppCompatEditText
 
     @BindView(R.id.sign_in_continue_button)
     lateinit var doLoginButton: MaterialButton
@@ -59,8 +58,11 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        val cleanIcon = ContextCompat.getDrawable(this, R.drawable.ic_cancel_black_24dp)
-        val arrowLeft = ContextCompat.getDrawable(this, R.drawable.ic_arrow_forward_black_24dp)
+        val cleanIcon =
+            VectorDrawableCompat.create(resources, R.drawable.ic_cancel_black_24dp, theme)
+        val arrowLeft =
+            VectorDrawableCompat.create(resources, R.drawable.ic_arrow_forward_black_24dp, theme)
+
         userNameField.setRightDrawable(cleanIcon)
         doLoginButton.setRightDrawable(arrowLeft)
 
