@@ -9,10 +9,13 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.CycleInterpolator
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Observer
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import br.com.esdrasdl.challenge.R
@@ -44,6 +47,9 @@ class SignInActivity : AppCompatActivity() {
 
     @BindView(R.id.sigin_in_error_warning)
     lateinit var sigInErrorWarning: TextView
+
+    @BindView(R.id.logo)
+    lateinit var logoView: ImageView
 
     private val viewModel: SignInViewModel by viewModel()
 
@@ -95,7 +101,13 @@ class SignInActivity : AppCompatActivity() {
                     }
                 }
                 ViewState.Status.SUCCESS -> {
-                    startActivity(Intent(this, OrderListActivity::class.java))
+                    val intent = Intent(this, OrderListActivity::class.java)
+                    val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        this,
+                        logoView,
+                        "logo"
+                    )
+                    ActivityCompat.startActivity(this, intent, options.toBundle())
                     finish()
                 }
             }

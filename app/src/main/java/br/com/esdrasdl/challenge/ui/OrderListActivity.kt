@@ -1,6 +1,7 @@
 package br.com.esdrasdl.challenge.ui
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ProgressBar
@@ -36,6 +37,10 @@ class OrderListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_order_list)
         ButterKnife.bind(this)
         val shouldDoLogin = intent?.getBooleanExtra(EXTRA_DO_LOGIN, false) ?: false
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.enterTransition = null
+        }
 
         handleState()
         if (savedInstanceState == null) {
@@ -84,7 +89,7 @@ class OrderListActivity : AppCompatActivity() {
             }
         })
     }
-    ;
+
     private fun setupRecyclerView(list: java.util.ArrayList<OrderItem>) {
         adapter = OrderListAdapter(list) { id ->
             val intent = Intent(this, OrderDetailsActivity::class.java)
