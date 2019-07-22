@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import br.com.concrete.canarinho.formatador.FormatadorValor
 import br.com.esdrasdl.challenge.R
@@ -17,10 +19,15 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class OrderListAdapter(
-    private val list: List<OrderItem>,
+    private val list: MutableList<OrderItem> = mutableListOf(),
     private val onClick: (String) -> Unit
 ) : RecyclerView.Adapter<OrderListAdapter.ViewHolder>() {
     private val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.US)
+
+    fun addItems(items: List<OrderItem>) {
+        list.addAll(items)
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -30,10 +37,13 @@ class OrderListAdapter(
     override fun getItemCount() = list.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(list[position])
+        holder.bind(list[position], position)
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+
+        @BindView(R.id.order_item_root)
+        lateinit var rootLayout: ConstraintLayout
 
         @BindView(R.id.order_item_value)
         lateinit var amountField: TextView
@@ -60,8 +70,15 @@ class OrderListAdapter(
             context = view.context
         }
 
-        fun bind(item: OrderItem) {
-            amountField.text = FormatadorValor.VALOR_COM_SIMBOLO.formata(item.totalAmount.toString())
+        fun bind(item: OrderItem, position: Int) {
+            if (position == 0) {
+                rootLayout.background = ContextCompat.getDrawable(context, R.drawable.bg_with_top_corner_rounded)
+            } else {
+                rootLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white))
+            }
+
+            amountField.text =
+                FormatadorValor.VALOR_COM_SIMBOLO.formata(item.totalAmount.toString())
             emailField.text = item.buyerEmail
             currentStatusField.text = when (OrderStatus.fromString(item.currentStatus)) {
                 OrderStatus.PAID -> context.getString(R.string.order_status_paid)
@@ -72,7 +89,7 @@ class OrderListAdapter(
             }
             dateField.text = dateFormatter.format(item.currentStatusDate)
             ownIdField.text = item.ownId
-            nextIcon.setOnClickListener {
+            rootLayout.setOnClickListener {
                 onClick.invoke(item.id)
             }
         }

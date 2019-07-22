@@ -6,7 +6,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.esdrasdl.challenge.R
 import br.com.esdrasdl.challenge.domain.model.Order
@@ -20,6 +24,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class OrderListActivity : AppCompatActivity() {
 
+    @BindView(R.id.order_list_header)
+    lateinit var headerContainer: ConstraintLayout
+
     @BindView(R.id.order_list)
     lateinit var recyclerView: RecyclerView
 
@@ -31,6 +38,28 @@ class OrderListActivity : AppCompatActivity() {
     private var listOfOrderItem = ArrayList<OrderItem>()
 
     private var adapter: OrderListAdapter? = null
+
+    private lateinit var layoutManager: LinearLayoutManager
+
+    private val toolbarElevation = object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            val isRecyclerViewScrolling = newState == RecyclerView.SCROLL_STATE_DRAGGING &&
+                    ViewCompat.getElevation(headerContainer) != -1f
+
+            if (newState == RecyclerView.SCROLL_STATE_IDLE &&
+                layoutManager.findFirstVisibleItemPosition() == 0 &&
+                layoutManager.findViewByPosition(0)!!.top == recyclerView.paddingTop &&
+                ViewCompat.getElevation(headerContainer) != 0f
+            ) {
+                ViewCompat.setElevation(headerContainer, 0f)
+            } else {
+                if (isRecyclerViewScrolling) {
+                    // grid scrolled, lower toolbar to allow content to pass in front
+                    ViewCompat.setElevation(headerContainer, -1f)
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +76,9 @@ class OrderListActivity : AppCompatActivity() {
             viewModel.init(shouldDoLogin)
         } else {
             listOfOrderItem = savedInstanceState.getParcelableArrayList(STATE_ORDER_LIST)
-            setupRecyclerView(listOfOrderItem)
         }
+
+        setupRecyclerView(listOfOrderItem)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -80,8 +110,7 @@ class OrderListActivity : AppCompatActivity() {
                     }.let {
                         ArrayList(it)
                     }
-
-                    setupRecyclerView(listOfOrderItem)
+                    adapter?.addItems(listOfOrderItem)
                 }
                 ViewState.Status.ERROR -> {
                     progress.visibility = View.GONE
@@ -90,13 +119,22 @@ class OrderListActivity : AppCompatActivity() {
         })
     }
 
-    private fun setupRecyclerView(list: java.util.ArrayList<OrderItem>) {
+    private fun setupRecyclerView(list: ArrayList<OrderItem>) {
+        layoutManager = LinearLayoutManager(this)
         adapter = OrderListAdapter(list) { id ->
             val intent = Intent(this, OrderDetailsActivity::class.java)
             intent.putExtra(OrderDetailsActivity.EXTRA_ORDER_ID, id)
             startActivity(intent)
         }
         recyclerView.adapter = adapter
+        recyclerView.layoutManager = layoutManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            recyclerView.addOnScrollListener(toolbarElevation)
+            headerContainer.doOnLayout {
+                val topPadding = headerContainer.height * 1.15
+                recyclerView.setPadding(0, topPadding.toInt(), 0, 0)
+            }
+        }
     }
 
     companion object {
